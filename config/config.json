@@ -2,7 +2,7 @@
   "development": {
     "username": "myuser",
     "password": "mypassword",
-    "database": "testpostgress_development",
+    "database": "testpostgress",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
