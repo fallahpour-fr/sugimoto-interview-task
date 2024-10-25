@@ -1,0 +1,89 @@
+{
+	"info": {
+		"_postman_id": "c457d5c8-87e7-47ef-b2ac-5fe5353c9fa2",
+		"name": "test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "28806173"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/books/",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmFtZSI6IkZhcnphbmVoMTIzIiwiaWF0IjoxNzI5Nzk4Mzc4LCJleHAiOjE3Mjk4MDE5Nzh9.2ytS4ubSZaPoSvQBto2VyzlHVvAf2I43jU_YvEmp7DI"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/books?author_id=4&page=1&limit=5&sort=DESC",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "author_id",
+							"value": "4"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						},
+						{
+							"key": "sort",
+							"value": "DESC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/books/create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Farzaneh123\",\r\n    \"country\":\"Iran\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/books/create"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/books/avg-books-price",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/books/avg-books-price"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/author-books",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/author-books"
+			},
+			"response": []
+		}
+	]
+}
