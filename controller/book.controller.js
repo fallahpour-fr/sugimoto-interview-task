@@ -1,5 +1,6 @@
 const {Book,Author}=require('../models/index');
 const jwt = require('jsonwebtoken');
+const { Sequelize } = require('../models');
 const { Op } = Sequelize;
 
 module.exports = {
@@ -83,26 +84,29 @@ module.exports = {
               include: [
                 [
                   Sequelize.fn('COUNT', Sequelize.col('Books.id')), 
-                  'bookCount' 
+                  'bookCount'
                 ]
               ]
             },
             group: ['Author.id'],
-            having: Sequelize.literal('COUNT("Books"."id") > 5'), 
+            having: Sequelize.where(
+              Sequelize.fn('COUNT', Sequelize.col('Books.id')),
+              { [Sequelize.Op.gt]: 5 }
+            ),
           });
       
-          return authors;
+          res.json(authors);
         } catch (error) {
           console.error('Error fetching authors:', error);
-          throw error;
+          res.status(500).json({ error: 'Failed to retrieve authors' });
         }
       },
-
-      getAverageBookPriceByCountry: async (req, res, next) =>  {
+      
+      getAverageBookPriceByCountry : async (req, res, next) => {
         try {
           const result = await Author.findAll({
             attributes: [
-              'country',
+              'country', 
               [Sequelize.fn('AVG', Sequelize.col('Books.price')), 'average_price']
             ],
             include: [
@@ -112,46 +116,46 @@ module.exports = {
                 through: { attributes: [] }
               }
             ],
-            group: ['country']
+            group: ['country'],
+            raw: true 
           });
       
-          console.log(result);
-          return result;
+          res.json(result);
         } catch (error) {
           console.error('Error fetching average book price by country:', error);
-          throw error;
+          res.status(500).json({ error: 'Failed to retrieve data' });
         }
-      },
+      },      
 
       getBooksByYearAndSortedByPrice : async (req, res, next) => {
-        const {year}=req.year;
-        try {
-          const books = await Book.findAll({
-            include: [
-              {
-                model: Author,
-                attributes: ['name'], 
-                through: { attributes: [] } 
-              }
-            ],
-            where: year
-              ? {
-                  publish_date: {
-                    [Op.between]: [
-                      `${year}-01-01`,
-                      `${year}-12-31`
-                    ]
-                  }
-                }
-              : {}, 
-            order: [['price', 'DESC']], 
-          });
-      
-          return books;
-        } catch (error) {
-          console.error('Error fetching books:', error);
-          throw error;
+        const { year } = req.query;
+  try {
+    const books = await Book.findAll({
+      include: [
+        {
+          model: Author,
+          attributes: ['name'],
+          through: { attributes: [] }
         }
+      ],
+      where: year
+        ? {
+            publish_date: {
+              [Op.between]: [
+                `${year}-01-01`,
+                `${year}-12-31`
+              ]
+            }
+          }
+        : {},
+      order: [['price', 'DESC']]
+    });
+
+    res.json(books);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    res.status(500).json({ error: 'Failed to retrieve books' });
+  }
       }
       
 }
