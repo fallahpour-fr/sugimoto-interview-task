@@ -1,5 +1,6 @@
 const {Book,Author}=require('../models/index');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { Op } = Sequelize;
 
 module.exports = {
     getBooks: async (req, res, next) => {
@@ -65,6 +66,91 @@ module.exports = {
         } catch (error) {
           console.error(error);
           res.status(500).send('Server error');
+        }
+      },
+
+      findMoreThanFiveBook: async (req, res, next) => {
+        try {
+          const authors = await Author.findAll({
+            include: [
+              {
+                model: Book,
+                attributes: [], 
+                through: { attributes: [] }, 
+              }
+            ],
+            attributes: {
+              include: [
+                [
+                  Sequelize.fn('COUNT', Sequelize.col('Books.id')), 
+                  'bookCount' 
+                ]
+              ]
+            },
+            group: ['Author.id'],
+            having: Sequelize.literal('COUNT("Books"."id") > 5'), 
+          });
+      
+          return authors;
+        } catch (error) {
+          console.error('Error fetching authors:', error);
+          throw error;
+        }
+      },
+
+      getAverageBookPriceByCountry: async (req, res, next) =>  {
+        try {
+          const result = await Author.findAll({
+            attributes: [
+              'country',
+              [Sequelize.fn('AVG', Sequelize.col('Books.price')), 'average_price']
+            ],
+            include: [
+              {
+                model: Book,
+                attributes: [],
+                through: { attributes: [] }
+              }
+            ],
+            group: ['country']
+          });
+      
+          console.log(result);
+          return result;
+        } catch (error) {
+          console.error('Error fetching average book price by country:', error);
+          throw error;
+        }
+      },
+
+      getBooksByYearAndSortedByPrice : async (req, res, next) => {
+        const {year}=req.year;
+        try {
+          const books = await Book.findAll({
+            include: [
+              {
+                model: Author,
+                attributes: ['name'], 
+                through: { attributes: [] } 
+              }
+            ],
+            where: year
+              ? {
+                  publish_date: {
+                    [Op.between]: [
+                      `${year}-01-01`,
+                      `${year}-12-31`
+                    ]
+                  }
+                }
+              : {}, 
+            order: [['price', 'DESC']], 
+          });
+      
+          return books;
+        } catch (error) {
+          console.error('Error fetching books:', error);
+          throw error;
         }
       }
       
